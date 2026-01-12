@@ -14,7 +14,7 @@ type MousePosition = {
 
 const UMBRELLA_RADIUS = 100;
 const DROP_SPAWN_RATE = 10;
-const GRAVITY = 0.2;
+const GRAVITY = 0.01;
 
 export default function Raindrops(): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);

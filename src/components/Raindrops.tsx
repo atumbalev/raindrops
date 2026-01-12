@@ -3,8 +3,8 @@ import { useEffect, useRef, type JSX } from "react";
 type Raindrop = {
   x: number;
   y: number;
-  speed: number;
-  length: number;
+  dy: number;
+  radius: number;
 };
 
 type MousePosition = {
@@ -14,6 +14,7 @@ type MousePosition = {
 
 const UMBRELLA_RADIUS = 100;
 const DROP_SPAWN_RATE = 10;
+const GRAVITY = 0.2;
 
 export default function Raindrops(): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -49,9 +50,9 @@ export default function Raindrops(): JSX.Element {
       for (let i = 0; i < DROP_SPAWN_RATE; i++) {
         dropsRef.current.push({
           x: Math.random() * canvas.width,
-          y: -10,
-          speed: 4 + Math.random() * 4,
-          length: 10 + Math.random() * 10,
+          y: -20,
+          dy: 2 + Math.random() * 2,
+          radius: 2 + Math.random() * 2,
         });
       }
     };
@@ -60,7 +61,8 @@ export default function Raindrops(): JSX.Element {
       const { x: mx, y: my } = mouseRef.current;
 
       dropsRef.current = dropsRef.current.filter((drop) => {
-        drop.y += drop.speed;
+        drop.dy += GRAVITY
+        drop.y += drop.dy;
 
         const dx = drop.x - mx;
         const dy = drop.y - my;
@@ -71,19 +73,41 @@ export default function Raindrops(): JSX.Element {
           return false;
         }
 
-        return drop.y < canvas.height;
+        return drop.y < canvas.height + 20;
       });
     };
 
     const drawDrops = (): void => {
-      ctx.strokeStyle = "rgba(100,150,255,0.7)";
-      ctx.lineWidth = 2;
+      ctx.fillStyle = "rgba(100,150,255,0.8)";
 
       for (const drop of dropsRef.current) {
+        const r = drop.radius;
+        const height = r * 5;
+
         ctx.beginPath();
-        ctx.moveTo(drop.x, drop.y);
-        ctx.lineTo(drop.x, drop.y + drop.length);
-        ctx.stroke();
+
+        // Top point
+        ctx.moveTo(drop.x, drop.y - height);
+
+        // Right side down to circle
+        ctx.bezierCurveTo(
+          drop.x + r * 0.2, drop.y - height * 0.5,
+          drop.x + r * 1.6, drop.y - r * 0.2,
+          drop.x + r, drop.y
+        );
+
+        // Bottom circle
+        ctx.arc(drop.x, drop.y, r, 0, Math.PI, false);
+
+        // Left side back to point
+        ctx.bezierCurveTo(
+          drop.x - r * 1.6, drop.y - r * 0.2,
+          drop.x - r * 0.2, drop.y - height * 0.5,
+          drop.x, drop.y - height
+        );
+
+        ctx.closePath();
+        ctx.fill();
       }
     };
 

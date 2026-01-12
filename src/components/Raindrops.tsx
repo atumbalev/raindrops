@@ -1,4 +1,5 @@
 import { useEffect, useRef, type JSX } from "react";
+import umbrellaImg from "../assets/umbrella.png";
 
 type Raindrop = {
   x: number;
@@ -12,7 +13,7 @@ type MousePosition = {
   y: number;
 };
 
-const UMBRELLA_RADIUS = 100;
+const UMBRELLA_RADIUS = 175;
 const DROP_SPAWN_RATE = 10;
 const GRAVITY = 0.01;
 
@@ -24,6 +25,9 @@ export default function Raindrops(): JSX.Element {
     y: window.innerHeight / 2,
   });
 
+  const umbrellaImageRef = useRef<HTMLImageElement | null>(null);
+  const imageLoadedRef = useRef(false);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -34,6 +38,13 @@ export default function Raindrops(): JSX.Element {
     const resize = (): void => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+    };
+
+    const umbrellaImage = new Image();  
+    umbrellaImage.src = umbrellaImg;
+    umbrellaImage.onload = () => {
+      imageLoadedRef.current = true;
+      umbrellaImageRef.current = umbrellaImage;
     };
 
     resize();
@@ -69,7 +80,7 @@ export default function Raindrops(): JSX.Element {
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         // Absorbed by umbrella (only above the mouse)
-        if (distance < UMBRELLA_RADIUS && drop.y < my) {
+        if ((mx + 75 > drop.x ) && distance < UMBRELLA_RADIUS && drop.y < my) {
           return false;
         }
 
@@ -113,18 +124,14 @@ export default function Raindrops(): JSX.Element {
 
     const drawUmbrella = (): void => {
       const { x, y } = mouseRef.current;
+      if (!imageLoadedRef.current || !umbrellaImageRef.current) return;
 
-      ctx.beginPath();
-      ctx.arc(x, y, UMBRELLA_RADIUS, Math.PI, 0);
-      ctx.strokeStyle = "rgba(0,0,0,0.6)";
-      ctx.lineWidth = 4;
-      ctx.stroke();
+      const img = umbrellaImageRef.current;
+      const imgWidth = 350;
+      const imgHeight = 350;
 
-      // Handle
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x, y + 30);
-      ctx.stroke();
+      // Center the umbrella image on the mouse
+      ctx.drawImage(img, x - imgWidth / 2 - 50, y - imgHeight + 75, imgWidth, imgHeight);
     };
 
     let animationFrameId: number;

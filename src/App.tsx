@@ -1,15 +1,11 @@
 import './App.css'
-import hamster from './assets/hampter.png'
-import Raindrops from './components/Raindrops';
+import HeroPage from './components/hero_page/HeroPage';
 
 
 function App() {
   return (
     <>
-      <Raindrops />
-      <main>
-        <img src={hamster} width='100px'/>
-      </main>
+      <HeroPage />
     </>
   );
 }

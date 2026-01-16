@@ -20,17 +20,12 @@ body {
 ================================ */
 body {
   font-family: "Libre Baskerville", Georgia, "Times New Roman", serif;
-
-  /* 🔑 THIS FIXES THE WHITE GAP */
   background-color: #2f2f2f;
-
   color: #f2f2f2;
-
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Prevent horizontal scroll + scrollbar jumps */
-  overflow-x: hidden;
+  overflow-x: hidden;          /* prevent horizontal scroll */
   scrollbar-gutter: stable both-edges;
 }
 
